@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Bíblico </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1e1b4b;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #4f46e5;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Intro Screen */
+        .intro-content h2 {
+            font-size: 1.8rem;
+            color: #1e1b4b;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .intro-content p {
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .info-box {
+            background: #dbeafe;
+            border-left: 4px solid #4f46e5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .info-box h3 {
+            color: #1e1b4b;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+        }
+
+        .info-box li {
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .info-box li:before {
+            content: "✓ ";
+            color: #4f46e5;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Quiz Screen */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .quiz-header .question-counter {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+
+        .quiz-header .score {
+            color: #1e1b4b;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #6366f1);
+            transition: width 0.3s ease;
+        }
+
+        .question-title {
+            font-size: 1.3rem;
+            color: #1e1b4b;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .option:hover {
+            border-color: #a5b4fc;
+            background: #f8fafc;
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            accent-color: #4f46e5;
+        }
+
+        .option label {
+            cursor: pointer;
+            flex: 1;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .option.selected {
+            border-color: #4f46e5;
+            background: #eef2ff;
+        }
+
+        .result-message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .result-message.correct {
+            background: #dcfce7;
+            border: 2px solid #86efac;
+        }
+
+        .result-message.incorrect {
+            background: #fee2e2;
+            border: 2px solid #fca5a5;
+        }
+
+        .result-message .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .result-message .content h4 {
+            margin-bottom: 4px;
+            font-size: 1rem;
+        }
+
+        .result-message.correct h4 {
+            color: #166534;
+        }
+
+        .result-message.incorrect h4 {
+            color: #991b1b;
+        }
+
+        .result-message.correct p {
+            color: #15803d;
+            font-size: 0.9rem;
+        }
+
+        .result-message.incorrect p {
+            color: #7f1d1d;
+            font-size: 0.9rem;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+        }
+
+        .btn-secondary:hover {
+            background: #eef2ff;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Results Screen */
+        .results-content {
+            text-align: center;
+        }
+
+        .results-content h2 {
+            font-size: 1.8rem;
+            color: #1e1b4b;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 15px;
+        }
+
+        .score-label {
+            font-size: 1.2rem;
+            color: #1e1b4b;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .score-max {
+            font-size: 0.9rem;
+            color: #4f46e5;
+            margin-bottom: 25px;
+        }
+
+        .results-summary {
+            background: #eef2ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .results-summary p {
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .results-summary strong {
+            color: #1e1b4b;
+            font-weight: 700;
+        }
+
+        /* Store Screen */
+        .store-header {
+            margin-bottom: 25px;
+        }
+
+        .store-header h2 {
+            font-size: 1.5rem;
+            color: #1e1b4b;
+            margin-bottom: 5px;
+        }
+
+        .store-header p {
+            color: #6b7280;
+        }
+
+        .bibles-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .bibles-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .bible-card {
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            text-align: center;
+        }
+
+        .bible-card:hover {
+            border-color: #a5b4fc;
+        }
+
+        .bible-card.affordable {
+            cursor: pointer;
+        }
+
+        .bible-card.not-affordable {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .bible-card.selected {
+            border-color: #4f46e5;
+            background: #eef2ff;
+        }
+
+        .bible-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .bible-name {
+            font-weight: 600;
+            color: #1e1b4b;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+
+        .bible-description {
+            font-size: 0.8rem;
+            color: #4f46e5;
+            margin-bottom: 10px;
+        }
+
+        .bible-cost {
+            font-weight: bold;
+            color: #4f46e5;
+            font-size: 0.9rem;
+        }
+
+        .bible-card.selected .bible-cost {
+            color: #4f46e5;
+        }
+
+        .bible-card.not-affordable .bible-cost {
+            color: #9ca3af;
+        }
+
+        .selected-indicator {
+            font-size: 0.8rem;
+            color: #4f46e5;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .summary-card {
+            background: #eef2ff;
+            border: 2px solid #c7d2fe;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card h3 {
+            color: #1e1b4b;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .summary-item span:last-child {
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        .summary-total {
+            border-top: 2px solid #c7d2fe;
+            padding-top: 12px;
+            margin-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: #1e1b4b;
+        }
+
+        .summary-total span:last-child {
+            color: #10b981;
+        }
+
+        .summary-total.negative span:last-child {
+            color: #ef4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .card {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .question-title {
+                font-size: 1.1rem;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .score-display {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📘 Quiz Bíblico </h1>
+            <p>Teste seus conhecimentos sobre a Bíblia</p>
+        </div>
+
+        <!-- Intro Screen -->
+        <div id="intro-screen" class="card">
+            <div class="intro-content">
+                <h2>Bem-vindo ao Quiz Bíblico!</h2>
+                <p>Responda 10 perguntas e ganhe pontos</p>
+                <div class="info-box">
+                    <h3>Como funciona:</h3>
+                    <ul>
+                        <li>Responda 10 perguntas sobre histórias bíblicas</li>
+                        <li>Ganhe 10 pontos por cada resposta correta</li>
+                        <li>Use seus pontos para resgatar diferentes versões de Bíblias</li>
+                        <li>Máximo de 100 pontos possíveis</li>
+                    </ul>
+                </div>
+                <button class="btn-primary btn-full" onclick="startQuiz()">Começar Quiz</button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="card hidden">
+            <div class="quiz-header">
+                <span class="question-counter">Pergunta <span id="current-question">1</span> de 10</span>
+                <span class="score">Pontos: <span id="current-score">0</span></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 10%"></div>
+            </div>
+            <div class="question-title" id="question-text"></div>
+            <div class="options-container" id="options-container"></div>
+            <div id="result-message" class="result-message hidden"></div>
+            <div class="button-group" id="quiz-buttons">
+                <button class="btn-primary" onclick="submitAnswer()">Confirmar Resposta</button>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="card hidden">
+            <div class="results-content">
+                <h2>Quiz Finalizado!</h2>
+                <div class="score-display" id="final-score">0</div>
+                <div class="score-label">Pontos conquistados</div>
+                <div class="score-max">Máximo possível: 100 pontos</div>
+                <div class="results-summary">
+                    <p>Você acertou <strong id="correct-count">0</strong> de <strong>10</strong> perguntas.</p>
+                </div>
+                <button class="btn-primary btn-full" onclick="goToStore()">Ir para Loja de Bíblias</button>
+            </div>
+        </div>
+
+        <!-- Store Screen -->
+        <div id="store-screen" class="card hidden">
+            <div class="store-header">
+                <h2>Loja de Bíblias</h2>
+                <p>Use seus <span id="store-points">0</span> pontos para resgatar uma Bíblia</p>
+            </div>
+            <div class="bibles-grid" id="bibles-grid"></div>
+            <div id="summary-container"></div>
+            <button class="btn-primary btn-full" onclick="finishStore()">Voltar ao Início</button>
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data
+        const quizQuestions = [
+            {
+                id: 1,
+                question: "Quem construiu a arca para sobreviver ao dilúvio?",
+                options: ["Adão", "Noé", "Abraão", "Moisés"],
+                correctAnswer: 1,
+                points: 10
+            },
+            {
+                id: 2,
+                question: "Quantos dias Deus levou para criar o mundo?",
+                options: ["Três dias", "Cinco dias", "Seis dias", "Sete dias"],
+                correctAnswer: 2,
+                points: 10
+            },
+            {
+                id: 3,
+                question: "Quem foi engolido por um grande peixe?",
+                options: ["Jonas", "Pedro", "Paulo", "Tiago"],
+                correctAnswer: 0,
+                points: 10
+            },
+            {
+                id: 4,
+                question: "Qual rei foi conhecido por sua grande sabedoria?",
+                options: ["Davi", "Salomão", "Herodes", "Saul"],
+                correctAnswer: 1,
+                points: 10
+            },
+            {
+                id: 5,
+                question: "Quem traiu Jesus por 30 moedas de prata?",
+                options: ["Pedro", "João", "Judas Iscariotes", "Tomé"],
+                correctAnswer: 2,
+                points: 10
+            },
+            {
+                id: 6,
+                question: "Qual era o nome dos três jovens lançados na fornalha ardente?",
+                options: ["Sadraque, Mesaque e Abednego", "Miquéias, Gabriel e Rafael", "Elias, Eliseu e Enoque", "Sansão, Gideão e Jefté"],
+                correctAnswer: 0,
+                points: 10
+            },
+            {
+                id: 7,
+                question: "Em qual livro da Bíblia encontramos os Dez Mandamentos pela primeira vez?",
+                options: ["Gênesis", "Êxodo", "Levítico", "Números"],
+                correctAnswer: 1,
+                points: 10
+            },
+            {
+                id: 8,
+                question: "Quem matou o gigante Golias?",
+                options: ["Sansão", "Davi", "Jônatas", "Saul"],
+                correctAnswer: 1,
+                points: 10
+            },
+            {
+                id: 9,
+                question: "Qual apóstolo negou Jesus três vezes?",
+                options: ["João", "Tiago", "Pedro", "André"],
+                correctAnswer: 2,
+                points: 10
+            },
+            {
+                id: 10,
+                question: "Qual foi o primeiro milagre de Jesus registrado na Bíblia?",
+                options: ["Curar um leproso", "Alimentar os cinco mil", "Transformar água em vinho nas bodas de Caná", "Ressuscitar Lázaro"],
+                correctAnswer: 2,
+                points: 10
+            }
+        ];
+
+        const bibles = [
+            {
+                id: 1,
+                name: "Bíblia King James",
+                description: "Tradução clássica em linguagem formal e solene",
+                cost: 30,
+                icon: "📕"
+            },
+            {
+                id: 2,
+                name: "Bíblia NVI",
+                description: "Nova Versão Internacional - tradução clara e precisa",
+                cost: 40,
+                icon: "📗"
+            },
+            {
+                id: 3,
+                name: "Bíblia Almeida",
+                description: "Tradução Almeida Corrigida - muito usada em igrejas",
+                cost: 35,
+                icon: "📘"
+            },
+            {
+                id: 4,
+                name: "Bíblia The Message",
+                description: "Versão em linguagem contemporânea e acessível",
+                cost: 45,
+                icon: "📙"
+            },
+            {
+                id: 5,
+                name: "Bíblia de Estudo",
+                description: "Completa com notas, mapas e referências cruzadas",
+                cost: 50,
+                icon: "📓"
+            },
+            {
+                id: 6,
+                name: "Bíblia Infantil",
+                description: "Histórias bíblicas ilustradas para crianças",
+                cost: 25,
+                icon: "📔"
+            }
+        ];
+
+        // State
+        let currentQuestion = 0;
+        let score = 0;
+        let answers = new Array(quizQuestions.length).fill(null);
+        let selectedAnswer = null;
+        let showResult = false;
+        let selectedBibles = [];
+
+        // Screen Management
+        function showScreen(screenId) {
+            document.getElementById('intro-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('store-screen').classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        // Start Quiz
+        function startQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answers = new Array(quizQuestions.length).fill(null);
+            selectedAnswer = null;
+            showResult = false;
+            selectedBibles = [];
+            loadQuestion();
+            showScreen('quiz-screen');
+        }
+
+        // Load Question
+        function loadQuestion() {
+            const question = quizQuestions[currentQuestion];
+            document.getElementById('question-text').textContent = question.question;
+            document.getElementById('current-question').textContent = currentQuestion + 1;
+            document.getElementById('current-score').textContent = score;
+            
+            const progressPercent = ((currentQuestion + 1) / quizQuestions.length) * 100;
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const label = document.createElement('label');
+                label.className = 'option';
+                label.innerHTML = `
+                    <input type="radio" name="answer" value="${index}" onchange="selectAnswer(${index})">
+                    <label for="option-${index}">${option}</label>
+                `;
+                container.appendChild(label);
+            });
+
+            document.getElementById('result-message').classList.add('hidden');
+            selectedAnswer = answers[currentQuestion];
+            showResult = false;
+            updateQuizButtons();
+        }
+
+        // Select Answer
+        function selectAnswer(index) {
+            selectedAnswer = index;
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, i) => {
+                if (i === index) {
+                    opt.classList.add('selected');
+                } else {
+                    opt.classList.remove('selected');
+                }
+            });
+        }
+
+        // Submit Answer
+        function submitAnswer() {
+            if (selectedAnswer === null) return;
+
+            const question = quizQuestions[currentQuestion];
+            const isCorrect = selectedAnswer === question.correctAnswer;
+
+            answers[currentQuestion] = selectedAnswer;
+
+            if (isCorrect) {
+                score += question.points;
+            }
+
+            showResult = true;
+            displayResult(isCorrect, question);
+            updateQuizButtons();
+        }
+
+        // Display Result
+        function displayResult(isCorrect, question) {
+            const resultDiv = document.getElementById('result-message');
+            resultDiv.classList.remove('hidden');
+            
+            if (isCorrect) {
+                resultDiv.className = 'result-message correct';
+                resultDiv.innerHTML = `
+                    <div class="icon">✓</div>
+                    <div class="content">
+                        <h4>Resposta Correta!</h4>
+                        <p>Você ganhou ${question.points} pontos</p>
+                    </div>
+                `;
+            } else {
+                resultDiv.className = 'result-message incorrect';
+                resultDiv.innerHTML = `
+                    <div class="icon">✗</div>
+                    <div class="content">
+                        <h4>Resposta Incorreta</h4>
+                        <p>A resposta correta é: ${question.options[question.correctAnswer]}</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('current-score').textContent = score;
+        }
+
+        // Update Quiz Buttons
+        function updateQuizButtons() {
+            const buttonsDiv = document.getElementById('quiz-buttons');
+            
+            if (!showResult) {
+                buttonsDiv.innerHTML = '<button class="btn-primary" onclick="submitAnswer()">Confirmar Resposta</button>';
+            } else {
+                let html = '';
+                if (currentQuestion > 0) {
+                    html += '<button class="btn-secondary" onclick="previousQuestion()">← Anterior</button>';
+                }
+                if (currentQuestion === quizQuestions.length - 1) {
+                    html += '<button class="btn-primary" onclick="finishQuiz()">Finalizar →</button>';
+                } else {
+                    html += '<button class="btn-primary" onclick="nextQuestion()">Próxima →</button>';
+                }
+                buttonsDiv.innerHTML = html;
+            }
+        }
+
+        // Next Question
+        function nextQuestion() {
+            if (currentQuestion < quizQuestions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        // Previous Question
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        // Finish Quiz
+        function finishQuiz() {
+            const correctCount = answers.filter((ans, idx) => ans === quizQuestions[idx].correctAnswer).length;
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('correct-count').textContent = correctCount;
+            showScreen('results-screen');
+        }
+
+        // Go to Store
+        function goToStore() {
+            selectedBibles = [];
+            document.getElementById('store-points').textContent = score;
+            renderBibles();
+            showScreen('store-screen');
+        }
+
+        // Render Bibles
+        function renderBibles() {
+            const grid = document.getElementById('bibles-grid');
+            grid.innerHTML = '';
+
+            bibles.forEach(bible => {
+                const canAfford = score >= bible.cost;
+                const isSelected = selectedBibles.includes(bible.id);
+                
+                const card = document.createElement('div');
+                card.className = 'bible-card';
+                if (isSelected) card.classList.add('selected');
+                if (!canAfford) card.classList.add('not-affordable');
+                if (canAfford) card.classList.add('affordable');
+                
+                card.onclick = () => selectBible(bible.id);
+                
+                card.innerHTML = `
+                    <div class="bible-icon">${bible.icon}</div>
+                    <div class="bible-name">${bible.name}</div>
+                    <div class="bible-description">${bible.description}</div>
+                    <div class="bible-cost">${bible.cost} pts</div>
+                    ${isSelected ? '<div class="selected-indicator">✓ Selecionada</div>' : ''}
+                `;
+                
+                grid.appendChild(card);
+            });
+
+            renderSummary();
+        }
+
+        // Select Bible
+        function selectBible(bibleId) {
+            const bible = bibles.find(b => b.id === bibleId);
+            if (!bible || score < bible.cost) return;
+
+            if (selectedBibles.includes(bibleId)) {
+                selectedBibles = selectedBibles.filter(id => id !== bibleId);
+            } else {
+                selectedBibles.push(bibleId);
+            }
+
+            renderBibles();
+        }
+
+        // Render Summary
+        function renderSummary() {
+            const container = document.getElementById('summary-container');
+            
+            if (selectedBibles.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const totalCost = selectedBibles.reduce((acc, id) => {
+                const bible = bibles.find(b => b.id === id);
+                return acc + (bible?.cost || 0);
+            }, 0);
+
+            const remaining = score - totalCost;
+
+            let html = '<div class="summary-card"><h3>Resumo do Resgate</h3>';
+            
+            selectedBibles.forEach(bibleId => {
+                const bible = bibles.find(b => b.id === bibleId);
+                html += `<div class="summary-item"><span>${bible.name}</span><span>-${bible.cost} pts</span></div>`;
+            });
+
+            html += `<div class="summary-total ${remaining < 0 ? 'negative' : ''}">
+                <span>Total:</span>
+                <span>${remaining} pts restantes</span>
+            </div></div>`;
+
+            html += '<button class="btn-success btn-full" onclick="confirmRedeem()">Confirmar Resgate</button>';
+
+            container.innerHTML = html;
+        }
+
+        // ========================================
+        // CONFIGURE SEU LINK AQUI
+        // ========================================
+        const REDIRECT_LINK = 'https://seu-link-aqui.com';
+        // Exemplos:
+        // const REDIRECT_LINK = 'https://seu-site.com';
+        // const REDIRECT_LINK = 'https://wa.me/5511999999999';
+        // const REDIRECT_LINK = 'https://seu-email@gmail.com';
+        // const REDIRECT_LINK = 'https://formulario.com';
+        // ========================================
+
+        // Confirm Redeem
+        function confirmRedeem() {
+            alert(`Parabéns! Você resgatou ${selectedBibles.length} Bíblia(s) com sucesso!`);
+            // Redirecionar para o link configurado
+            if (REDIRECT_LINK && REDIRECT_LINK !== 'https://seu-link-aqui.com') {
+                window.location.href = REDIRECT_LINK;
+            } else {
+                alert('⚠️ Link não configurado! Edite o arquivo HTML e adicione seu link na variável REDIRECT_LINK');
+                finishStore();
+            }
+        }
+
+        // Finish Store
+        function finishStore() {
+            currentQuestion = 0;
+            score = 0;
+            answers = new Array(quizQuestions.length).fill(null);
+            selectedAnswer = null;
+            showResult = false;
+            selectedBibles = [];
+            showScreen('intro-screen');
+        }
+    </script>
+</body>
+</html>
