@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Quiz Bíblico </title>
+    <title>Quiz Bíblico Interativo</title>
     <style>
         * {
             margin: 0;
@@ -18,48 +18,31 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
         }
 
         .header {
             text-align: center;
             margin-bottom: 30px;
+            animation: slideDown 0.6s ease-out;
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            color: #1e1b4b;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.1rem;
-            color: #4f46e5;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
+        @keyframes slideDown {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
@@ -67,35 +50,94 @@
             }
         }
 
+        .header h1 {
+            font-size: 2.8rem;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 800;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+        }
+
         .hidden {
             display: none !important;
         }
 
+        /* Intro Screen */
         .intro-content h2 {
-            font-size: 1.8rem;
-            color: #1e1b4b;
-            margin-bottom: 10px;
-            text-align: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-weight: 800;
         }
 
         .intro-content p {
-            color: #6b7280;
+            color: #666;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
         }
 
         .info-box {
-            background: #dbeafe;
-            border-left: 4px solid #4f46e5;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
         }
 
         .info-box h3 {
-            color: #1e1b4b;
-            margin-bottom: 12px;
-            font-size: 1rem;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            font-weight: 700;
         }
 
         .info-box ul {
@@ -103,270 +145,444 @@
         }
 
         .info-box li {
-            color: #374151;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 0.98rem;
+            font-weight: 500;
         }
 
         .info-box li:before {
-            content: "✓ ";
-            color: #4f46e5;
+            content: "✨ ";
+            color: #667eea;
             font-weight: bold;
-            margin-right: 8px;
+            margin-right: 10px;
         }
 
+        /* Quiz Screen */
         .quiz-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-size: 1rem;
         }
 
         .quiz-header .question-counter {
-            color: #4f46e5;
-            font-weight: 600;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
         }
 
         .quiz-header .score {
-            color: #1e1b4b;
-            font-weight: bold;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.95rem;
         }
 
         .progress-bar {
             width: 100%;
-            height: 6px;
-            background: #e5e7eb;
-            border-radius: 3px;
-            margin-bottom: 25px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 30px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #4f46e5, #6366f1);
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
         }
 
         .question-title {
-            font-size: 1.3rem;
-            color: #1e1b4b;
-            margin-bottom: 25px;
-            font-weight: 600;
+            font-size: 1.6rem;
+            color: #333;
+            margin-bottom: 35px;
+            font-weight: 700;
+            line-height: 1.4;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
         .option {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
+            padding: 18px 20px;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             background: white;
+            position: relative;
+            overflow: hidden;
+            animation: slideInLeft 0.5s ease-out backwards;
+        }
+
+        .option:nth-child(1) { animation-delay: 0.1s; }
+        .option:nth-child(2) { animation-delay: 0.2s; }
+        .option:nth-child(3) { animation-delay: 0.3s; }
+        .option:nth-child(4) { animation-delay: 0.4s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .option:hover::before {
+            left: 100%;
         }
 
         .option:hover {
-            border-color: #a5b4fc;
-            background: #f8fafc;
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea10, #764ba210);
+            transform: translateX(5px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
         }
 
         .option input[type="radio"] {
-            margin-right: 15px;
+            margin-right: 18px;
             cursor: pointer;
-            width: 20px;
-            height: 20px;
-            accent-color: #4f46e5;
+            width: 24px;
+            height: 24px;
+            accent-color: #667eea;
+            flex-shrink: 0;
         }
 
         .option label {
             cursor: pointer;
             flex: 1;
-            color: #374151;
-            font-size: 1rem;
+            color: #333;
+            font-size: 1.05rem;
+            font-weight: 600;
         }
 
         .option.selected {
-            border-color: #4f46e5;
-            background: #eef2ff;
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .option.correct {
+            border-color: #10b981;
+            background: linear-gradient(135deg, #10b98120, #34d39920);
+            animation: pulse 0.6s ease-out;
+        }
+
+        .option.incorrect {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #ef444420, #f8717720);
+            animation: shake 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
         .result-message {
-            padding: 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
             display: flex;
-            gap: 12px;
+            gap: 15px;
             align-items: flex-start;
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .result-message.correct {
-            background: #dcfce7;
-            border: 2px solid #86efac;
+            background: linear-gradient(135deg, #10b98120, #34d39920);
+            border: 3px solid #10b981;
         }
 
         .result-message.incorrect {
-            background: #fee2e2;
-            border: 2px solid #fca5a5;
+            background: linear-gradient(135deg, #ef444420, #f8717720);
+            border: 3px solid #ef4444;
         }
 
         .result-message .icon {
-            font-size: 1.5rem;
+            font-size: 2rem;
             flex-shrink: 0;
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .result-message .content h4 {
-            margin-bottom: 4px;
-            font-size: 1rem;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+            font-weight: 700;
         }
 
         .result-message.correct h4 {
-            color: #166534;
+            color: #10b981;
         }
 
         .result-message.incorrect h4 {
-            color: #991b1b;
+            color: #ef4444;
         }
 
         .result-message.correct p {
-            color: #15803d;
-            font-size: 0.9rem;
+            color: #059669;
+            font-size: 0.95rem;
+            font-weight: 600;
         }
 
         .result-message.incorrect p {
-            color: #7f1d1d;
-            font-size: 0.9rem;
+            color: #dc2626;
+            font-size: 0.95rem;
+            font-weight: 600;
         }
 
+        /* Buttons */
         .button-group {
             display: flex;
-            gap: 12px;
-            margin-top: 25px;
+            gap: 15px;
+            margin-top: 30px;
         }
 
         button {
-            padding: 12px 24px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             flex: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:active::before {
+            width: 300px;
+            height: 300px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(79, 70, 229, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(-1px);
         }
 
         .btn-primary:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
         }
 
         .btn-secondary {
             background: white;
-            color: #4f46e5;
-            border: 2px solid #4f46e5;
+            color: #667eea;
+            border: 3px solid #667eea;
+            font-weight: 700;
         }
 
         .btn-secondary:hover {
-            background: #eef2ff;
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
         }
 
         .btn-success {
             background: linear-gradient(135deg, #10b981, #34d399);
             color: white;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
         }
 
         .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
         }
 
         .btn-full {
             width: 100%;
         }
 
+        /* Results Screen */
         .results-content {
             text-align: center;
         }
 
         .results-content h2 {
-            font-size: 1.8rem;
-            color: #1e1b4b;
-            margin-bottom: 30px;
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 40px;
+            font-weight: 800;
+            animation: slideDown 0.6s ease-out;
         }
 
         .score-display {
-            font-size: 4rem;
-            font-weight: bold;
-            color: #4f46e5;
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 15px;
+            animation: scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         .score-label {
-            font-size: 1.2rem;
-            color: #1e1b4b;
-            font-weight: 600;
+            font-size: 1.3rem;
+            color: #333;
+            font-weight: 700;
             margin-bottom: 10px;
         }
 
         .score-max {
-            font-size: 0.9rem;
-            color: #4f46e5;
-            margin-bottom: 25px;
+            font-size: 1rem;
+            color: #999;
+            margin-bottom: 30px;
+            font-weight: 600;
         }
 
         .results-summary {
-            background: #eef2ff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 25px;
+            background: linear-gradient(135deg, #667eea15, #764ba215);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
         }
 
         .results-summary p {
-            color: #374151;
-            font-size: 0.95rem;
+            color: #555;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .results-summary strong {
-            color: #1e1b4b;
-            font-weight: 700;
+            color: #667eea;
+            font-weight: 800;
         }
 
+        /* Store Screen */
         .store-header {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            animation: slideDown 0.6s ease-out;
         }
 
         .store-header h2 {
-            font-size: 1.5rem;
-            color: #1e1b4b;
-            margin-bottom: 5px;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            font-weight: 800;
         }
 
         .store-header p {
-            color: #6b7280;
+            color: #666;
+            font-size: 1.05rem;
+            font-weight: 600;
         }
 
         .bibles-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 18px;
+            margin-bottom: 30px;
         }
 
         @media (max-width: 600px) {
@@ -376,17 +592,29 @@
         }
 
         .bible-card {
-            padding: 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
+            padding: 20px;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             background: white;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: slideInLeft 0.5s ease-out backwards;
         }
 
+        .bible-card:nth-child(1) { animation-delay: 0.1s; }
+        .bible-card:nth-child(2) { animation-delay: 0.2s; }
+        .bible-card:nth-child(3) { animation-delay: 0.3s; }
+        .bible-card:nth-child(4) { animation-delay: 0.4s; }
+        .bible-card:nth-child(5) { animation-delay: 0.5s; }
+        .bible-card:nth-child(6) { animation-delay: 0.6s; }
+
         .bible-card:hover {
-            border-color: #a5b4fc;
+            border-color: #667eea;
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
         }
 
         .bible-card.affordable {
@@ -399,105 +627,128 @@
         }
 
         .bible-card.selected {
-            border-color: #4f46e5;
-            background: #eef2ff;
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            animation: pulse 0.6s ease-out;
         }
 
         .bible-icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 3rem;
+            margin-bottom: 12px;
+            animation: bounce 0.6s ease-out;
         }
 
         .bible-name {
-            font-weight: 600;
-            color: #1e1b4b;
-            margin-bottom: 5px;
-            font-size: 0.95rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
         }
 
         .bible-description {
-            font-size: 0.8rem;
-            color: #4f46e5;
-            margin-bottom: 10px;
+            font-size: 0.85rem;
+            color: #999;
+            margin-bottom: 12px;
+            font-weight: 500;
         }
 
         .bible-cost {
-            font-weight: bold;
-            color: #4f46e5;
-            font-size: 0.9rem;
-        }
-
-        .bible-card.selected .bible-cost {
-            color: #4f46e5;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1rem;
         }
 
         .bible-card.not-affordable .bible-cost {
-            color: #9ca3af;
+            color: #ccc;
         }
 
         .selected-indicator {
-            font-size: 0.8rem;
-            color: #4f46e5;
-            font-weight: 600;
-            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 800;
+            margin-top: 10px;
+            animation: bounce 0.6s ease-out;
         }
 
         .summary-card {
-            background: #eef2ff;
-            border: 2px solid #c7d2fe;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            animation: slideInUp 0.5s ease-out;
         }
 
         .summary-card h3 {
-            color: #1e1b4b;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+            color: #667eea;
+            margin-bottom: 18px;
+            font-size: 1.2rem;
+            font-weight: 800;
         }
 
         .summary-item {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            color: #374151;
-            font-size: 0.95rem;
+            padding: 10px 0;
+            color: #555;
+            font-size: 0.98rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .summary-item:last-of-type {
+            border-bottom: none;
         }
 
         .summary-item span:last-child {
-            font-weight: 600;
-            color: #4f46e5;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .summary-total {
-            border-top: 2px solid #c7d2fe;
-            padding-top: 12px;
-            margin-top: 12px;
+            border-top: 3px solid #667eea;
+            padding-top: 15px;
+            margin-top: 15px;
             display: flex;
             justify-content: space-between;
-            font-weight: bold;
-            color: #1e1b4b;
+            font-weight: 800;
+            color: #333;
+            font-size: 1.1rem;
         }
 
         .summary-total span:last-child {
-            color: #10b981;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .summary-total.negative span:last-child {
-            color: #ef4444;
+            background: linear-gradient(135deg, #ef4444, #f87171);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
+        /* Responsive */
         @media (max-width: 600px) {
             .card {
-                padding: 25px;
+                padding: 30px;
             }
 
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
 
             .question-title {
-                font-size: 1.1rem;
+                font-size: 1.4rem;
             }
 
             .button-group {
@@ -505,7 +756,34 @@
             }
 
             .score-display {
-                font-size: 3rem;
+                font-size: 4rem;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .quiz-header .question-counter,
+            .quiz-header .score {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            animation: confettiFall 3s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
             }
         }
     </style>
@@ -513,14 +791,14 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📘 Quiz Bíblico </h1>
+            <h1>📘 Quiz Bíblico</h1>
             <p>Teste seus conhecimentos sobre a Bíblia</p>
         </div>
 
         <div id="intro-screen" class="card">
             <div class="intro-content">
-                <h2>Bem-vindo ao Quiz Bíblico!</h2>
-                <p>Responda 10 perguntas e ganhe pontos</p>
+                <h2>Bem-vindo!</h2>
+                <p>Responda 10 perguntas e ganhe pontos incríveis</p>
                 <div class="info-box">
                     <h3>Como funciona:</h3>
                     <ul>
@@ -530,14 +808,14 @@
                         <li>Máximo de 100 pontos possíveis</li>
                     </ul>
                 </div>
-                <button class="btn-primary btn-full" type="button" onclick="window.app.startQuiz()">Começar Quiz</button>
+                <button class="btn-primary btn-full" type="button" onclick="window.app.startQuiz()">🚀 Começar Agora</button>
             </div>
         </div>
 
         <div id="quiz-screen" class="card hidden">
             <div class="quiz-header">
-                <span class="question-counter">Pergunta <span id="current-question">1</span> de 10</span>
-                <span class="score">Pontos: <span id="current-score">0</span></span>
+                <span class="question-counter">Pergunta <span id="current-question">1</span>/10</span>
+                <span class="score">⭐ <span id="current-score">0</span> pts</span>
             </div>
             <div class="progress-bar">
                 <div class="progress-fill" id="progress-fill" style="width: 10%"></div>
@@ -545,38 +823,34 @@
             <div class="question-title" id="question-text"></div>
             <div class="options-container" id="options-container"></div>
             <div id="result-message" class="result-message hidden"></div>
-            <div class="button-group" id="quiz-buttons">
-                <button class="btn-primary" type="button" onclick="window.app.submitAnswer()">Confirmar Resposta</button>
-            </div>
         </div>
 
         <div id="results-screen" class="card hidden">
             <div class="results-content">
-                <h2>Quiz Finalizado!</h2>
+                <h2>🎉 Parabéns!</h2>
                 <div class="score-display" id="final-score">0</div>
                 <div class="score-label">Pontos conquistados</div>
                 <div class="score-max">Máximo possível: 100 pontos</div>
                 <div class="results-summary">
                     <p>Você acertou <strong id="correct-count">0</strong> de <strong>10</strong> perguntas.</p>
                 </div>
-                <button class="btn-primary btn-full" type="button" onclick="window.app.goToStore()">Ir para Loja de Bíblias</button>
+                <button class="btn-primary btn-full" type="button" onclick="window.app.goToStore()">💎 Resgatar Bíblias</button>
             </div>
         </div>
 
         <div id="store-screen" class="card hidden">
             <div class="store-header">
-                <h2>Loja de Bíblias</h2>
-                <p>Use seus <span id="store-points">0</span> pontos para resgatar uma Bíblia</p>
+                <h2>💎 Loja de Bíblias</h2>
+                <p>Use seus <span id="store-points">0</span> pontos para resgatar</p>
             </div>
             <div class="bibles-grid" id="bibles-grid"></div>
             <div id="summary-container"></div>
-            <button class="btn-primary btn-full" type="button" onclick="window.app.finishStore()">Voltar ao Início</button>
+            <button class="btn-primary btn-full" type="button" onclick="window.app.finishStore()">↻ Recomeçar</button>
         </div>
     </div>
 
     <script>
         window.app = {
-            // Quiz Data
             quizQuestions: [
                 {
                     id: 1,
@@ -654,67 +928,55 @@
                 {
                     id: 1,
                     name: "Bíblia King James",
-                    description: "Tradução clássica em linguagem formal e solene",
+                    description: "Tradução clássica e solene",
                     cost: 30,
                     icon: "📕"
                 },
                 {
                     id: 2,
                     name: "Bíblia NVI",
-                    description: "Nova Versão Internacional - tradução clara e precisa",
+                    description: "Versão clara e precisa",
                     cost: 40,
                     icon: "📗"
                 },
                 {
                     id: 3,
                     name: "Bíblia Almeida",
-                    description: "Tradução Almeida Corrigida - muito usada em igrejas",
+                    description: "Muito usada em igrejas",
                     cost: 35,
                     icon: "📘"
                 },
                 {
                     id: 4,
                     name: "Bíblia The Message",
-                    description: "Versão em linguagem contemporânea e acessível",
+                    description: "Linguagem contemporânea",
                     cost: 45,
                     icon: "📙"
                 },
                 {
                     id: 5,
                     name: "Bíblia de Estudo",
-                    description: "Completa com notas, mapas e referências cruzadas",
+                    description: "Com notas e referências",
                     cost: 50,
                     icon: "📓"
                 },
                 {
                     id: 6,
                     name: "Bíblia Infantil",
-                    description: "Histórias bíblicas ilustradas para crianças",
+                    description: "Histórias ilustradas",
                     cost: 25,
                     icon: "📔"
                 }
             ],
 
-            // ========================================
-            // CONFIGURE SEU LINK AQUI
-            // ========================================
-            REDIRECT_LINK: 'https://compraseguraonline.org.ua/c/6cddaab801',
-            // Exemplos:
-            // REDIRECT_LINK: 'https://seu-site.com',
-            // REDIRECT_LINK: 'https://wa.me/5511999999999',
-            // REDIRECT_LINK: 'https://seu-email@gmail.com',
-            // REDIRECT_LINK: 'https://formulario.com',
-            // ========================================
+            REDIRECT_LINK: 'https://seu-link-aqui.com',
 
-            // State
             currentQuestion: 0,
             score: 0,
             answers: [],
             selectedAnswer: null,
-            showResult: false,
             selectedBibles: [],
 
-            // Screen Management
             showScreen: function(screenId) {
                 document.getElementById('intro-screen').classList.add('hidden');
                 document.getElementById('quiz-screen').classList.add('hidden');
@@ -723,19 +985,16 @@
                 document.getElementById(screenId).classList.remove('hidden');
             },
 
-            // Start Quiz
             startQuiz: function() {
                 this.currentQuestion = 0;
                 this.score = 0;
                 this.answers = new Array(this.quizQuestions.length).fill(null);
                 this.selectedAnswer = null;
-                this.showResult = false;
                 this.selectedBibles = [];
                 this.loadQuestion();
                 this.showScreen('quiz-screen');
             },
 
-            // Load Question
             loadQuestion: function() {
                 const question = this.quizQuestions[this.currentQuestion];
                 document.getElementById('question-text').textContent = question.question;
@@ -760,12 +1019,9 @@
                 });
 
                 document.getElementById('result-message').classList.add('hidden');
-                this.selectedAnswer = this.answers[this.currentQuestion];
-                this.showResult = false;
-                this.updateQuizButtons();
+                this.selectedAnswer = null;
             },
 
-            // Select Answer
             selectAnswer: function(index) {
                 this.selectedAnswer = index;
                 const options = document.querySelectorAll('.option');
@@ -776,9 +1032,13 @@
                         opt.classList.remove('selected');
                     }
                 });
+
+                // Desabilitar cliques em outras opções
+                setTimeout(() => {
+                    this.submitAnswer();
+                }, 300);
             },
 
-            // Submit Answer
             submitAnswer: function() {
                 if (this.selectedAnswer === null) return;
 
@@ -789,86 +1049,49 @@
 
                 if (isCorrect) {
                     this.score += question.points;
+                    this.createConfetti();
                 }
 
-                this.showResult = true;
-                this.displayResult(isCorrect, question);
-                this.updateQuizButtons();
-            },
+                const options = document.querySelectorAll('.option');
+                options.forEach(opt => opt.style.pointerEvents = 'none');
 
-            // Display Result
-            displayResult: function(isCorrect, question) {
-                const resultDiv = document.getElementById('result-message');
-                resultDiv.classList.remove('hidden');
-                
                 if (isCorrect) {
-                    resultDiv.className = 'result-message correct';
-                    resultDiv.innerHTML = `
-                        <div class="icon">✓</div>
-                        <div class="content">
-                            <h4>Resposta Correta!</h4>
-                            <p>Você ganhou ${question.points} pontos</p>
-                        </div>
-                    `;
+                    options[this.selectedAnswer].classList.add('correct');
                 } else {
-                    resultDiv.className = 'result-message incorrect';
-                    resultDiv.innerHTML = `
-                        <div class="icon">✗</div>
-                        <div class="content">
-                            <h4>Resposta Incorreta</h4>
-                            <p>A resposta correta é: ${question.options[question.correctAnswer]}</p>
-                        </div>
-                    `;
+                    options[this.selectedAnswer].classList.add('incorrect');
                 }
 
-                document.getElementById('current-score').textContent = this.score;
-            },
-
-            // Update Quiz Buttons
-            updateQuizButtons: function() {
-                const buttonsDiv = document.getElementById('quiz-buttons');
-                
-                if (!this.showResult) {
-                    buttonsDiv.innerHTML = '<button class="btn-primary" type="button" onclick="window.app.submitAnswer()">Confirmar Resposta</button>';
-                } else {
-                    let html = '';
-                    if (this.currentQuestion > 0) {
-                        html += '<button class="btn-secondary" type="button" onclick="window.app.previousQuestion()">← Anterior</button>';
-                    }
-                    if (this.currentQuestion === this.quizQuestions.length - 1) {
-                        html += '<button class="btn-primary" type="button" onclick="window.app.finishQuiz()">Finalizar →</button>';
+                // Próxima pergunta automaticamente
+                setTimeout(() => {
+                    if (this.currentQuestion < this.quizQuestions.length - 1) {
+                        this.currentQuestion++;
+                        this.loadQuestion();
                     } else {
-                        html += '<button class="btn-primary" type="button" onclick="window.app.nextQuestion()">Próxima →</button>';
+                        this.finishQuiz();
                     }
-                    buttonsDiv.innerHTML = html;
+                }, 1000);
+            },
+
+            createConfetti: function() {
+                for (let i = 0; i < 30; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.backgroundColor = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'][Math.floor(Math.random() * 5)];
+                    confetti.style.animationDelay = Math.random() * 0.3 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
                 }
             },
 
-            // Next Question
-            nextQuestion: function() {
-                if (this.currentQuestion < this.quizQuestions.length - 1) {
-                    this.currentQuestion++;
-                    this.loadQuestion();
-                }
-            },
-
-            // Previous Question
-            previousQuestion: function() {
-                if (this.currentQuestion > 0) {
-                    this.currentQuestion--;
-                    this.loadQuestion();
-                }
-            },
-
-            // Finish Quiz
             finishQuiz: function() {
                 const correctCount = this.answers.filter((ans, idx) => ans === this.quizQuestions[idx].correctAnswer).length;
                 document.getElementById('final-score').textContent = this.score;
                 document.getElementById('correct-count').textContent = correctCount;
                 this.showScreen('results-screen');
+                this.createConfetti();
             },
 
-            // Go to Store
             goToStore: function() {
                 this.selectedBibles = [];
                 document.getElementById('store-points').textContent = this.score;
@@ -876,7 +1099,6 @@
                 this.showScreen('store-screen');
             },
 
-            // Render Bibles
             renderBibles: function() {
                 const grid = document.getElementById('bibles-grid');
                 grid.innerHTML = '';
@@ -892,7 +1114,9 @@
                     if (!canAfford) card.classList.add('not-affordable');
                     if (canAfford) card.classList.add('affordable');
                     
-                    card.onclick = function() { self.selectBible(bible.id); };
+                    card.onclick = function() { 
+                        if (canAfford) self.selectBible(bible.id);
+                    };
                     
                     card.innerHTML = `
                         <div class="bible-icon">${bible.icon}</div>
@@ -908,7 +1132,6 @@
                 this.renderSummary();
             },
 
-            // Select Bible
             selectBible: function(bibleId) {
                 const bible = this.bibles.find(b => b.id === bibleId);
                 if (!bible || this.score < bible.cost) return;
@@ -922,7 +1145,6 @@
                 this.renderBibles();
             },
 
-            // Render Summary
             renderSummary: function() {
                 const container = document.getElementById('summary-container');
                 
@@ -938,7 +1160,7 @@
 
                 const remaining = this.score - totalCost;
 
-                let html = '<div class="summary-card"><h3>Resumo do Resgate</h3>';
+                let html = '<div class="summary-card"><h3>📋 Resumo do Resgate</h3>';
                 
                 this.selectedBibles.forEach(bibleId => {
                     const bible = this.bibles.find(b => b.id === bibleId);
@@ -947,40 +1169,38 @@
 
                 html += `<div class="summary-total ${remaining < 0 ? 'negative' : ''}">
                     <span>Total:</span>
-                    <span>${remaining} pts restantes</span>
+                    <span>${remaining} pts</span>
                 </div></div>`;
 
-                html += '<button class="btn-success btn-full" type="button" onclick="window.app.confirmRedeem()">Confirmar Resgate</button>';
+                html += '<button class="btn-success btn-full" type="button" onclick="window.app.confirmRedeem()">✨ Confirmar Resgate</button>';
 
                 container.innerHTML = html;
             },
 
-            // Confirm Redeem
             confirmRedeem: function() {
-                alert(`Parabéns! Você resgatou ${this.selectedBibles.length} Bíblia(s) com sucesso!`);
-                if (this.REDIRECT_LINK && this.REDIRECT_LINK !== 'https://seu-link-aqui.com') {
-                    window.location.href = this.REDIRECT_LINK;
-                } else {
-                    alert('⚠️ Link não configurado! Edite o arquivo HTML e adicione seu link na variável REDIRECT_LINK');
-                    this.finishStore();
-                }
+                this.createConfetti();
+                setTimeout(() => {
+                    if (this.REDIRECT_LINK && this.REDIRECT_LINK !== 'https://seu-link-aqui.com') {
+                        window.location.href = this.REDIRECT_LINK;
+                    } else {
+                        alert('⚠️ Link não configurado! Edite o arquivo HTML e adicione seu link na variável REDIRECT_LINK');
+                        this.finishStore();
+                    }
+                }, 500);
             },
 
-            // Finish Store
             finishStore: function() {
                 this.currentQuestion = 0;
                 this.score = 0;
                 this.answers = new Array(this.quizQuestions.length).fill(null);
                 this.selectedAnswer = null;
-                this.showResult = false;
                 this.selectedBibles = [];
                 this.showScreen('intro-screen');
             }
         };
 
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Quiz Bíblico carregado com sucesso!');
+            console.log('🎯 Quiz Bíblico Pro carregado com sucesso!');
         });
     </script>
 </body>
